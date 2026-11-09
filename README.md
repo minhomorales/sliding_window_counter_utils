@@ -45,3 +45,10 @@ Rate limiting and "events in the last N seconds" dashboards need a window that a
 ## Edge you will hit
 
 The eviction boundary is **exclusive at the cutoff**: an event whose timestamp equals `now - window` is treated as expired. With `window=5.0`, an event observed at `t=0` is gone at `t=5.0`, not `t=5.0001`. If you need inclusive behavior at the boundary, widen the window by an epsilon in your own code — the library will not guess which side of the fence you want.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
